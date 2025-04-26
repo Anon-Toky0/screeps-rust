@@ -1,0 +1,55 @@
+servers:
+  # 部署到主 MMO 服务器 - 请注意，官方服务器（mmo、season 和 ptr）
+  # 仅支持使用令牌进行身份验证
+  mmo:
+    host: screeps.com
+    secure: true
+    token: your-auth-token-here
+    branch: default
+  # 公共测试领域是测试代码的一个不错选择
+  ptr:
+    host: screeps.com
+    secure: true
+    token: your-auth-token-here
+    path: /ptr
+    branch: default
+  # 季节性服务器配置 - 此环境每个季节都有独特的机制，
+  # 因此为不同的机制设置功能标志可能是有意义的
+  season:
+    host: screeps.com
+    secure: true
+    token: your-auth-token-here
+    path: /season
+    branch: default
+  private-server:
+    host: 127.0.0.1
+    port: 21025
+    secure: false
+    username: user
+    password: password
+    branch: default
+configs:
+  # 是否为每个配置的服务器压缩生成的 JavaScript
+  terser:
+    # 特殊的 '*' 键为所有服务器设置默认值，
+    # 但会被适用的每服务器配置 **覆盖**
+    '*': false
+    ptr: false
+    localhost: false
+  # 传递给 wasm-pack 的附加选项，用于为每个服务器自定义构建
+  wasm-pack-options:
+    # 特殊的 '*' 键设置应用于所有服务器的标志，
+    # 这些标志会与任何适用的每服务器配置 **拼接**
+
+    # 这些设置会导致目标 wasm 功能集排除 Screeps 的 Node.js 版本中不存在的较新功能。
+    '*': [ "--config", "build.rustflags=['-Ctarget-cpu=mvp']" ]
+    # '*': [ "--config", "build.rustflags=['-Ctarget-cpu=mvp']", "-Z", "build-std=std,panic_abort" ]
+    # 或者，可以单独禁用有问题的功能：
+    #'*': ["--config", "build.rustflags=['-Ctarget-feature=-reference-types','-Ctarget-feature=-multivalue','-Ctarget-feature=-sign-ext']", "-Z", "build-std=std,panic_abort"]
+
+    # 此设置为这些目标启用了 `mmo` crate 功能，
+    # 它启用了 MMO 特有的跨分片通信和像素生成的 API 功能
+    mmo: [ "--features", "mmo" ]
+    ptr: [ "--features", "mmo" ]
+    # 其他服务器可以有自己的构建标志，包括 crate 功能：
+    #season: ["--features", "my-season-7-feature"]

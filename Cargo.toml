@@ -1,0 +1,45 @@
+[package]
+name = "screeps-rust"
+version = "0.0.0"
+authors = []
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+js-sys = "0.3.77"
+log = "0.4.27"
+fern = "0.7.1"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+serde-wasm-bindgen = "0.6.5"
+screeps-game-api = "0.23.0"
+# If you'd like to use a locally-cloned out version of the game API crate
+# (for testing PRs, etc), you can use a local path (replacing the above line):
+# screeps-game-api = { path = "../screeps-game-api" }
+wasm-bindgen = "0.2.100"
+web-sys = { version = "0.3.77", features = ["console"] }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.50"
+
+[profile.release]
+panic = "abort"
+opt-level = 3
+lto = true
+
+[package.metadata.wasm-pack.profile.release]
+# See wasm-opt for full available options; handy examples:
+# -O4 - optimize aggressively for performance
+# -Oz - optimize aggressively for code size
+# -g - leave debug info in place, allowing for more descriptive stack traces on panic
+# --signext-lowering - removes opcodes that the screeps servers can't load (see 
+# https://github.com/rustyscreeps/screeps-game-api/issues/391)
+wasm-opt = ["-O4", "--signext-lowering"]
+
+[features]
+default = []
+
+sim = ["screeps-game-api/sim"]
+mmo = ["screeps-game-api/mmo"]
